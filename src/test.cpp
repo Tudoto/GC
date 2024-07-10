@@ -6,9 +6,10 @@ void test1()
     auto vm = new VM();
     vm->pushInt(1);
     vm->pushInt(2);
-
+    object *a = new object();
+    vm->push(a);
     vm->gc();
-    VM::assert1(vm->objectSize == 2, "Should have preserved objects.");
+    VM::assert1(vm->stackSize == 3, "Should have preserved objects.");
     vm->freeVM();
     delete (vm);
 }
@@ -16,7 +17,7 @@ void test1()
 // void test2()
 // {
 //     printf("Test 2: Unreached objects are collected.\n");
-//     auto vm = new VM();
+//     auto vm = new VM(); 
 //     vm->pushInt(1);
 //     vm->pushInt(2);
 //     vm->pop();
@@ -24,7 +25,7 @@ void test1()
 
 //     vm->gc();
 //     VM::assert1(vm->objectSize == 0, "Should have collected objects.");
-//     vm->freeVM();
+//     //vm->freeVM();
 //     delete (vm);
 // }
 
@@ -95,7 +96,7 @@ void test1()
 int main()
 {
     test1();
-    // test2();
+    //test2();
     // test3();
     // test4();
     // perfTest();

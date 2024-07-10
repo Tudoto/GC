@@ -1,11 +1,7 @@
 #include "VM.h"
 #include "Object.h"
 
-// reload new opt
-void *object::operator new(size_t size)
-{
-    return GetHeapInstance()->Alloc(size);
-}
+
 
 VM::VM()
 {
@@ -15,7 +11,7 @@ VM::VM()
 void VM::freeVM()
 {
     stackSize = 0;
-    gc();
+   // gc();
 }
 
 VM::~VM()
@@ -25,28 +21,25 @@ VM::~VM()
 
 void VM::pushInt(int value)
 {
-    object *obj = new object();
-    stack[stackSize] = obj;
-    obj->value = value;
+
+    //object *obj = new object();
+    stack[stackSize] = reinterpret_cast<object*>(value);
+    //obj->value = value;
     stackSize++;
-    objectSize++;
-    obj->next = listHead;
-    listHead = obj;
-    obj->type = typeInfo::INT;
+    //objectSize++;
+    //obj->next = listHead;
+    //listHead = obj;
+    //obj->type = typeInfo::INT;
 }
 
-object *VM::push(object *value)
+void VM::push(object *obj)
 {
     assert1(stackSize < MAX_STACK, "stack overflow");
-    object *obj = new object();
     stack[stackSize] = obj;
-    obj->ref = value;
+    rootSet.push(obj);
     stackSize++;
-    objectSize++;
-    obj->next = listHead;
-    listHead = obj;
-    obj->type = typeInfo::REF;
-    return obj;
+    //obj->next = listHead;
+    //listHead = obj;
 }
 
 object *VM::pop()
@@ -63,38 +56,26 @@ void VM::gc()
 
 void VM::mark()
 {
-    for (int i = 0; i < stackSize; i++)
+    printf("marking...\n");
+    while(!rootSet.empty())
     {
-        trace(stack[i]);
+        trace(rootSet.top());
+        rootSet.pop();
     }
 }
 
 void VM::sweep()
 {
-    object **obj = &listHead;
-    // COMMENT: why not use listHead directly?
-    //  Using object** obj = &listHead allows you to modify the original linked list through indirect reference (through pointer). This is because you can change the pointer pointed to by obj itself, thereby changing the structure of the linked list.
-    while (*obj != nullptr)
-    {
-        // if the obj was not marked,remove it from list
-        if ((*obj)->marked == 0)
-        {
-
-            object *temp = *obj;
-            *obj = temp->next;
-            delete temp;
-            objectSize--;
-        }
-        else
-        {
-            (*obj)->marked = 0;
-            obj = &(*obj)->next;
-        }
-    }
+    printf("sweeping...\n");
+    //visitor for each object in heap
+    // for mark-sweep, we should traverse the entire heap
+    // for copy gc ,we only  need to check until currentAddr 
+    GetHeapInstance()->forEachObject();
 }
 
 void VM::trace(object *obj)
 {
+    
     if (obj == nullptr)
     {
         // TODO:exception
@@ -105,7 +86,8 @@ void VM::trace(object *obj)
         return;
     }
     obj->marked = 1;
-    if (obj->type == typeInfo::REF && obj->ref != nullptr)
+    //printf("trace obj is %p\n", obj);
+    if (obj->ref != nullptr)
     {
         trace(obj->ref);
     }

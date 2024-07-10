@@ -1,3 +1,0 @@
-/Users/zhangenqi/Documents/project/GC/build/CMakeFiles/GCtest.dir
-/Users/zhangenqi/Documents/project/GC/build/CMakeFiles/edit_cache.dir
-/Users/zhangenqi/Documents/project/GC/build/CMakeFiles/rebuild_cache.dir

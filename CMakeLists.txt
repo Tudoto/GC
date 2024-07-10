@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 3.29)
+cmake_minimum_required(VERSION 3.16)
 
 # 项目名称
 project(GCtest VERSION 1.0 LANGUAGES CXX)
